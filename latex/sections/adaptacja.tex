@@ -1,4 +1,75 @@
 \section{Mechanizmy adaptacyjne}
-\subsection{Adaptacja macierzy kowariancji}
-\subsection{Kumulatywna adaptacja zasięgu mutacji}
+Pseudokod zawarty na wypisie (\ref{alg-CMA-ES}) przedstawia kanoniczną wersję algorytmu \texttt{CMA-ES}. Metoda steruje trzema parametrami: wektorem oczekiwanym $\wek{m}^{t}$, macierzą kowariancji
+$\mat{C}^t$ oraz zasięgiem mutacji $\sigma^t$. Parametry te specyfikują wielowymiarowy rozkład normalny, który służy do tworzenia nowych punktów. Indeks górny $t$ oznacza numer iteracji algorytmu.
+W każdej iteracji algorytm przy pomocy rozkładu normalnego z zerową wartoścoią oczekiwaną oraz macierzą kowariancji $\mat{C}^t}$ generuje zbiór wektorów $\{\wek{d}_1^t,...,\wek{d}_\lambda^t\}$ (linia 6). 
+Wektory te służą do zaburzenia obecnego w danej iteracji wektora wartości oczekiwanej $\wek{m}^t$ wskutek czego powstają wektory pochodne $\wek{x}^t_i=\wek{m}^t+\sigma^t \wek{d}_i^t$.
+Zbiór wektorów pochodnych jest sortowany malejąco (linia 10). Ze zbioru $\lambda$ wektorów wydzielany jest podzbiór $\mu$ wektorów o najmniejszej wartości funkcji celu. Podzbiór ten służy do
+aktualizacji parametrów algorytmu. \\
+Wartość oczekiwana $\wek{m}^t$ rozkładu aktualizowana jest wskutek zsumowania jej ze średnią ważoną wyselekcjonowanych wektorów $\wek{d}_{i}^{t}$. Wagi $w_{i]$ powinny być liczbami dodatnimi, których suma wynosi $1$ \cite{HansenOstermeier01}.
+\begin{algorithm}[h]
+\caption{CMA-ES}
+\label{alg-CMA-ES}
+\begin{algorithmic}[1]
+\STATE $t \gets 1$
+\STATE initialize$(\wek{m}^1,\sigma^1, C^1)$
+\STATE $\wek{p}_c^1 \gets \wek{0}$, $\wek{p}_\sigma^1 \gets \wek{0}$
+\WHILE{!stop}
+   \FOR{$i=1$ \TO $\lambda$}
+      \STATE $ \wek{d}_i^t \sim N(\wek{0}, \mat{C}^t) $
+      \STATE $\wek{x}_i^t=\wek{m}^{t} + \sigma^t \wek{d}_i^t $
+      \STATE evaluate $(\wek{x}_i^t)$
+   \ENDFOR
+   \STATE sort $ \left(\{ \wek{x}_i^t \} \right) $
+  
+   \STATE $\wek{\Delta}^{t} \gets \sum_{i=1}^\mu w_i \wek{d}_i^t $
+   \STATE $\wek{m}^{t+1} \gets \wek{m}^{t+1} + \sigma^t \wek{\Delta}^{t} $
+   \STATE $\wek{p}_c^{t+1} \gets (1-c_p)\wek{p}_c^t + \sqrt{\mu_\text{eff} c_p(2-c_p)} \cdot \wek{\Delta}^{t}$ where \newline
+          $\qquad \mu_\text{eff}=1/\left(\sum_{i=1}^\mu (w_i)^2\right)$
+   \STATE $\mat{C}^{t+1} \gets (1-c_1-c_\mu)\mat{C}^t + c_1 \mat{C}^t_1 + c_\mu  \mat{C}^t_\mu$ where \newline
+$\qquad \mat{C}_\mu^t=\frac{1}{\mu_\text{eff}}\sum_{i=1}^\mu w_i(\wek{d}_i^t)(\wek{d}_i^t)^\tran$, \newline
+$\qquad \mat{C}_1^t=(\wek{p}_c^t)(\wek{p}_c^t)^\tran$
+
+   \STATE $\sigma^{t+1} \gets $ CSA $(\sigma^t, \mat{C}^{t}, \wek{\Delta}^{t})$ 
+      
+   \STATE $t \gets t+1$
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+Sposób aktualizacji macierzy kowariancji oraz parametru zasięgu mutacji ze względu na jego znaczenie opisałem kolejno w sekcji (\ref{CMA}) oraz (\ref{CSA}).
+\subsection{Adaptacja macierzy kowariancji \label{CMA}}
+  Macierz kowariancji $\mat{C}^{t+1}}$ wyliczana jest jako suma złożona z dwóch składników. Pierwszy z nich, $\mat{C}^t_\mu$, jest macierzą rangi $\mu$, która powstaje jako ważona suma iloczynu zewnętrznego $\mu$ wektorów  $\wek{d}_{i}^{t}$. Drugi z nich,  $\mat{C}^t_1$, jest macierzą o rzędzie równym 1 powstałą jako iloczyn zewnętrzny wektora $\wek{p}_c^t$. Wektor ten jest jedną ze ścieżek ewolucyjnych, które utrzymuje algortym w ramach swojego działania. 
+  Oba składniki mają na celu zwiększenie prawdopodobieństwa wylosowania wektorów w kierunku poprawy, tj. mniejszej wartości funkcji celu. Wkład macierzy $\mat{C}^t_\mu$ reprezentuje zysk, który przynosi selekcja osobników, a z kolei macierz $\mat{C}^t_1$ -- zysk wnoszony przez ścieżkę ewolucyjną $\wek{p}_c^t$. Ścieżkę tę należy rozumieć jako trajektorię populacji zgodnie z którą kierunki tworzenia nowych punktów były najlepsze \cite{evol-path}.
+\subsection{Kumulatywna adaptacja zasięgu mutacji \label{CSA}}
+Sposób aktualizowania zasięgu mutacji $\sigma^t$ oparty jest na poniższym rozumowaniu. Niech funkcja celu $f$ będzie funkcją stałą. Wówczas składowe wektorów $\wek{d}_i^t$ nie posiadają korelacji z ich położeniem w przestrzeni.
+Konsekwencją tego jest fakt, że wyselekcjonowane wektory  $\wek{d}_i^t$ są niezależne oraz zgodne z rozkładem $\mathcal{N}(0, \mat{C}^{t})$. W wyniku przekształcenia
+  \begin{equation}
+    (\mat{C}^{t})^{-\frac{1}{2}}\wek{d}_{i}^{t}
+  \end{equation}
+  wektory będą zgodne z izotropowym rozkładem normalnym, tj. $\mathcal{N}(0, I)$. W związku z powżyszym wektor $(\mat{C}^t)^{-1/2} \wek{\Delta}^t$ będzie posiadał rozkład normalny z zerową wartością oczekiwaną
+  oraz macierzą kowariancji równą:
+  \begin{equation}
+    \Sigma((\mat{C}^t)^{-1/2} \wek{\Delta}^t) = \sum_{i=1}^\mu (w_i)^2 \mat{I}=\frac{1}{\mu_\text{eff}} \mat{I}
+    \label{eq:01}
+  \end{equation}
+
+\floatname{algorithm}{Procedure}
+\setcounter{algorithm}{0}
+\begin{algorithm}[h]
+\caption{CSA}
+\begin{algorithmic}[1]
+   \STATE $\wek{p}_\sigma^{t+1} \gets (1-c_s)\wek{p}_\sigma^t + \sqrt{\mu_\text{eff} c_s(2-c_s)} \cdot (\mat{C}^t)^{-\frac{1}{2}}\wek{\Delta}^t$
+   \STATE $\sigma^{t+1} \gets \sigma^t \exp\left(\frac{c_s}{d_\sigma} \left(\frac{\| \wek{p}_\sigma^{t+1} \|}{E\|N(\wek{0},\mat{I})\|}-1\right)\right) $
+
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Złożoność obliczeniowa}
+
+  Obie opisane wyżej reguły przyczyniają się do znacznej poprawy działania algorytmu w kontekście ekstrapolacji i eksploatacji przestrzeni przeszukiwań. Niestety, ceną tego jest fakt znacznie zwiększona złożoność obliczeniowa algorytmu. Wynika ona z faktu stosowania operacji wyliczania pierwiastka kwadratowego macierzy (linia 6 algorytmu \ref{alg-CMA-ES}) oraz odwrotności tego pierwiastka (linia 1 \ref{alg-CSA}).
+  W kanonicznej wersji algorytmu operacja ta jest realizowana przez rozkład spektralny macierzy symetrycznej, tj. rozkład macierzy kowariancji $\mat{C}$ na następującą postać:
+  \begin{equation}
+    \mat{C} = \mat{B}\mat{D}^{2}\mat{B}^{T}
+  \end{equation}
+  Umożliwia ona zarówno wyliczenie pierwiastka kwadratowego jak i odwrotoność macierzy. Jednakże złożoność tych operacji jest rzędu $\mathcal{O}(n^3)$, co ogranicza stosowalność metody \texttt{CMA-ES} w przypadku zadań optymalizacyjnych o większej wymiarowości, tj. $N > 100$ \cite{cma-es-tutorial}.
+  Poczyniono szereg działań w kierunku zmniejszenia złożoności obliczeniowej algorytmu. 
+
