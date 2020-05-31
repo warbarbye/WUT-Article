@@ -1,4 +1,5 @@
 \section{Eksperymenty numerczyne}
+\label{section:eksperymenty}
   W celu weryfikacji proponowanych zmian skorzystałem ze standaryzowanych zadań optymalizacyjnych stosowanych w ramach konkursu
   \textbf{IEEE CEC'2017} \cite{cec2017}. Ze względu na fakt, że jest to jeden z najbardziej popularnych zbiorów problemów testowych, uzyskałem
   możliwość względnie obiektywnego porównania moich pomysłów z klasyczną wersją algorytmu \texttt{CMA-ES} oraz jego modyfikacjami.
@@ -12,20 +13,20 @@
 
 \subsection{Parametry eksperymentów}
   W ramach eksperymentu porównałem proponowane przeze mnie metody z algorytmem \texttt{CMA-ES} w klasycznej postaci oraz z algorytmem \texttt{MSR-CMA-ES}.
-  Wszystkie wspólne parametry metod jak rozmiar populacji $\lambda$ są zgodne z zalecaniami przedstawionymi pzez autora algorytmu w \cite{cmaes-tutorial}.
-  Specyficzne parametry algorytmu \texttt{MSR-CMA-ES} ustalono zgodnie z sugerowanymi wartościami w \cite{cmaes-msr}. 
+  Wszystkie wspólne parametry metod jak rozmiar populacji $\lambda$ są zgodne z zalecaniami przedstawionymi pzez autora algorytmu w \cite{CMADEhansen}.
+  Specyficzne parametry algorytmu \texttt{MSR-CMA-ES} ustalono zgodnie z sugerowanymi wartościami w \cite{Elhara13}. 
 
 \subsection{Wyniki na standaryzowanych problemach testowych}
 
-Na wykresie \ref{cec-ecdf} przedstawione są uzyskane wyniki. Standardowa wersja algorytmu \texttt{CMA-ES} przewyższa wszystkie inne
+Na wykresie \ref{cec-17} przedstawione są uzyskane wyniki. Standardowa wersja algorytmu \texttt{CMA-ES} przewyższa wszystkie inne
 rozważane w artykule modyfikacje tej metody. Reguła CPEF charakteryzuje się najgorszą wydajnością. Ogólna wydajność PPMF jest porównywalna z CPMF, z niewielką przewagą PPMF nad CPMF. Obie metody dają lepsze wyniki niż MSR-CMA-ES.
 
 \begin{figure}[ht]
 \begin{centering}
-\includegraphics[width = 0.9\textwidth, angle = 0]{./media/cec-17-13.png}
+\includegraphics[width = 0.9\textwidth]{./media/cec-17-13.png}
 \end{centering}
-\caption{Comparison of ECDF curves of CMA-ES coupled with step-size control rules for all problems from the CEC'2013 and CEC'2017 benchmark sets}
-\label{fig13-17}
+\caption{Krzywde ECDF uzyskane dla wszystkich problemów zdefiniowanych w konkursie \texttt{CEC'17}}
+\label{cec-17}
 \end{figure}
 
 
