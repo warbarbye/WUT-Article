@@ -1,3 +1,31 @@
 \section{Eksperymenty numerczyne}
-\subsection{Zbieżność na funkcji kwadratowej}
+  W celu weryfikacji proponowanych zmian skorzystałem ze standaryzowanych zadań optymalizacyjnych stosowanych w ramach konkursu
+  \textbf{IEEE CEC'2017} \cite{cec2017}. Ze względu na fakt, że jest to jeden z najbardziej popularnych zbiorów problemów testowych, uzyskałem
+  możliwość względnie obiektywnego porównania moich pomysłów z klasyczną wersją algorytmu \texttt{CMA-ES} oraz jego modyfikacjami.
+  Problemy w ramach zestawu zadań podzielone są na funkcje: unimodalne, multimodalne oraz kompozytowe. Problemy kompozytowane są
+  złożeniami problemów multimodalnych, które dodatkowo podlegają pewnym przekształceniom jak obrót czy translacja.
+  Sposób w jaki funkcje testowe są skontruowane ma na celu sprawdzić różne własności algorytmu, a w szczególności: odporność na zaszumienie funkcji celu,
+  niezmienniczość na przekształcenia afiniczne lub wymiar zadania.
+  Porównanie testowanych metod sprowadza się do porównania, która z nich uzyskała mniejszą wartość funkcji celu przy ustalonym budżecie wywołań funkcji celu.
+  Organizatorzy konkursu sugerują, aby wyniki testów przedstawiane były w postaci tabelarycznej, ale ze względu na większą czytelność zdecydowałem się przedstawiać je za pomocą krzywych ECDF (ang. Empirical Cumulative Distribution Function). Krzywa ECDF konstruowana jest w taki sposób, że na osi odciętych odkładany jest odsetek posiadanego budżetu wywołań funkcji, a na osi rzędnych -- procent problemów rozwiązanych przy zadanym budżecie przez algorytm. Im większe jest pole pod krzywą danego algorytmu, tym lepszy wynik uzyskał on względem pozostałych metod.
+  
+
+\subsection{Parametry eksperymentów}
+  W ramach eksperymentu porównałem proponowane przeze mnie metody z algorytmem \texttt{CMA-ES} w klasycznej postaci oraz z algorytmem \texttt{MSR-CMA-ES}.
+  Wszystkie wspólne parametry metod jak rozmiar populacji $\lambda$ są zgodne z zalecaniami przedstawionymi pzez autora algorytmu w \cite{cmaes-tutorial}.
+  Specyficzne parametry algorytmu \texttt{MSR-CMA-ES} ustalono zgodnie z sugerowanymi wartościami w \cite{cmaes-msr}. 
+
 \subsection{Wyniki na standaryzowanych problemach testowych}
+
+Na wykresie \ref{cec-ecdf} przedstawione są uzyskane wyniki. Standardowa wersja algorytmu \texttt{CMA-ES} przewyższa wszystkie inne
+rozważane w artykule modyfikacje tej metody. Reguła CPEF charakteryzuje się najgorszą wydajnością. Ogólna wydajność PPMF jest porównywalna z CPMF, z niewielką przewagą PPMF nad CPMF. Obie metody dają lepsze wyniki niż MSR-CMA-ES.
+
+\begin{figure}[ht]
+\begin{centering}
+\includegraphics[width = 0.9\textwidth, angle = 0]{./media/cec-17-13.png}
+\end{centering}
+\caption{Comparison of ECDF curves of CMA-ES coupled with step-size control rules for all problems from the CEC'2013 and CEC'2017 benchmark sets}
+\label{fig13-17}
+\end{figure}
+
+
