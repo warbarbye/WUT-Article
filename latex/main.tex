@@ -1,12 +1,12 @@
 \input{config}
 
-\title{Zasady składania artykułu z wykorzystaniem zmodyfikowanego szablonu LNCS}
-\titlerunning{Zasady składania artyk. z wykorzyst. zmodyfikowanego szablonu LNCS.} % abbreviated if normal is too long
-\author{Gall Anonim}
-\authorrunning{G. Anonim}
+\title{Modyfikacja reguł adaptacji macierzy kowariancji oraz zasięgu mutacji w strategiach ewolucyjnych}
+\titlerunning{Modyfikacja reguł adaptacji w strategiach ewolucyjnych}
+\author{Eryk Warchulski}
+\authorrunning{Eryk Warchulski}
 \institute{Instytut Informatyki, Politechnika Warszawska\\
-	\dummyemail % remove and use valid email instead
-%	\email{gall.anonim.stud@pw.edu.pl}
+%	\dummyemail % remove and use valid email instead
+	\email{eryk.warchulski.tud@pw.edu.pl}
 }
 
 \begin{document}
@@ -14,18 +14,20 @@
 \maketitle
 
 \begin{abstract}
-	W niniejszym dokumencie o~wersji \input{../VERSION}przedstawiono zestaw zasad składania artykułu dla potrzeb realizacji założeń Seminarium Dyplomowego Magisterskiego 2 z~wykorzystaniem zaleceń formatowania wydawnictwa Springer. Omówiono reguły wykorzystania nagłówków i~popularnych konstrukcji tekstowych (tabele, twierdzenia, propozycje, itd.). Zasygnalizowano przykładowe błędy i~sposoby ich uniknięcia.
-
+  W niniejszym artykule podejmuję problem modyfikacji dotychczasowych reguł adaptacji macierzy kowariancji oraz zasięgu mutacji w metodach strategii ewolucyjnych.
+  Proponuję trzy metody kontroli zasięgu mutacji. Każda z nich bazuje na wartości funkcji celu punktu środkowego oraz na uproszczonej regule adaptacji macierzy kowariancji.
+  Na podstawie przeprowadzonych przeze mnie eksperymentów wynika, że proponowane metody osiągają liniową zbieżność dla kwadratowej funkcji celu. Ponadto osiągane przez nie wyniki na standaryzowanych problemach testowych zdefiniowanych w ramach konkrusu \texttt{CEC'2017} sugerują, że są one konkurencyjne wobec obecnie stosowanych modyfikacji. 
 	\keywords{
-		zalecenia formatowania artykułu,
-		szablon LNCS.
+    Strategie ewolucyjne, optymalizacja, CMA-ES, CSA
 	}
 \end{abstract}
 
 % Content
-\input{sections/introduction}
-\input{sections/formatting}
-\input{sections/summary}
+\input{sections/wprowadzenie}
+\input{sections/adaptacje}
+\input{sections/modyfikacje}
+\input{sections/eksperymenty}
+\input{sections/podsumowanie}
 \input{bibliography}
 
 \end{document}
