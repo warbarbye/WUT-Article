@@ -9,27 +9,27 @@ Wartość oczekiwana $\wek{m}^t$ rozkładu aktualizowana jest wskutek zsumowania
 
 \begin{algorithm}
   \renewcommand{\thealgorithm}{}
-%  \caption{CMAES} \label{alg-CMA-ES}
+  \caption{CMAES} \label{alg-CMA-ES}
   \begin{algorithmic}[1]
   \State $t \gets 1$
-%\State $\wek{p}_c^1 \gets \wek{0}$, $\wek{p}_\sigma^1 \gets \wek{0}$
-%\While{!stop}
-   %\For{$i=1$ \to $\lambda$}
-      %\State $ \wek{d}_i^t \sim N(\wek{0}, \mat{C}^t) $
-      %\State $\wek{x}_i^t=\wek{m}^{t} + \sigma^t \wek{d}_i^t $
-      %\State evaluate $(\wek{x}_i^t)$
-   %\EndFor
-   %\State sort $ \left(\{ \wek{x}_i^t \} \right) $
-   %\State $\wek{\Delta}^{t} \gets \sum_{i=1}^\mu w_i \wek{d}_i^t $
-   %\State $\wek{m}^{t+1} \gets \wek{m}^{t+1} + \sigma^t \wek{\Delta}^{t} $
-   %\State $\wek{p}_c^{t+1} \gets (1-c_p)\wek{p}_c^t + \sqrt{\mu_\text{eff} c_p(2-c_p)} \cdot \wek{\Delta}^{t}$ where \newline
-          %$\qquad \mu_\text{eff}=1/\left(\sum_{i=1}^\mu (w_i)^2\right)$
-   %\State $\mat{C}^{t+1} \gets (1-c_1-c_\mu)\mat{C}^t + c_1 \mat{C}^t_1 + c_\mu  \mat{C}^t_\mu$ where \newline
-%$\qquad \mat{C}_\mu^t=\frac{1}{\mu_\text{eff}}\sum_{i=1}^\mu w_i(\wek{d}_i^t)(\wek{d}_i^t)^\tran$, \newline
-%$\qquad \mat{C}_1^t=(\wek{p}_c^t)(\wek{p}_c^t)^\tran$
-   %\State $\sigma^{t+1} \gets $ CSA $(\sigma^t, \mat{C}^{t}, \wek{\Delta}^{t})$ 
-   %\State $t \gets t+1$
-%\EndWhile
+\State $\wek{p}_c^1 \gets \wek{0}$, $\wek{p}_\sigma^1 \gets \wek{0}$
+\While{!stop}
+   \For{$i=1$ \to $\lambda$}
+      \State $ \wek{d}_i^t \sim N(\wek{0}, \mat{C}^t) $
+      \State $\wek{x}_i^t=\wek{m}^{t} + \sigma^t \wek{d}_i^t $
+      \State evaluate $(\wek{x}_i^t)$
+   \EndFor
+   \State sort $ \left(\{ \wek{x}_i^t \} \right) $
+   \State $\wek{\Delta}^{t} \gets \sum_{i=1}^\mu w_i \wek{d}_i^t $
+   \State $\wek{m}^{t+1} \gets \wek{m}^{t+1} + \sigma^t \wek{\Delta}^{t} $
+   \State $\wek{p}_c^{t+1} \gets (1-c_p)\wek{p}_c^t + \sqrt{\mu_\text{eff} c_p(2-c_p)} \cdot \wek{\Delta}^{t}$ where \newline
+          $\qquad \mu_\text{eff}=1/\left(\sum_{i=1}^\mu (w_i)^2\right)$
+   \State $\mat{C}^{t+1} \gets (1-c_1-c_\mu)\mat{C}^t + c_1 \mat{C}^t_1 + c_\mu  \mat{C}^t_\mu$ where \newline
+$\qquad \mat{C}_\mu^t=\frac{1}{\mu_\text{eff}}\sum_{i=1}^\mu w_i(\wek{d}_i^t)(\wek{d}_i^t)^\tran$, \newline
+$\qquad \mat{C}_1^t=(\wek{p}_c^t)(\wek{p}_c^t)^\tran$
+   \State $\sigma^{t+1} \gets $ CSA $(\sigma^t, \mat{C}^{t}, \wek{\Delta}^{t})$ 
+   \State $t \gets t+1$
+\EndWhile
 \end{algorithmic}
 \end{algorithm}
 Sposób aktualizacji macierzy kowariancji oraz parametru zasięgu mutacji ze względu na jego znaczenie opisałem kolejno w sekcji (\ref{CMA}) oraz (\ref{CSA}).
