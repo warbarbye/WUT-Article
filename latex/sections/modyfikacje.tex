@@ -1,2 +1,32 @@
 \section{Modyfikacje reguł adaptacyjnych}
-\subsection{Kontrola środka populacji}
+  Dokonane przeze mnie modyfikacje algorytmu dotyczyły postaci 
+  reguły adaptacji macierzy kowariancji oraz zasięgu mutacji.
+  W celu zmniejszenia narzutu obliczeniowego zastosowano zmiany sugerowane
+  w \cite{simplify}. Autorzy, bazując na obserwacji, że klasycznie stosowana reguła adaptacji macierzy kowariancji daje się sprowadzić do ogólnej postaci:
+    \begiin{equation}
+      \mat{A}\mat{A}^{T} = \mat{M}\left[\mat{I} + \mat{B}\right]\mat{M}^{T}
+    \end{equation}
+
+    zastosowali rozwinięcie macierzy $\mat{A}$, która odpowiada macierzy $\mat{C}^{t+1}$ w kontekście logiki algorytmu, w szereg potęgowy:
+    \begiin{equation}
+      \mat{A} = \mat{M}\sum^{\infty}_{i = 0}\gamma_{i}\mat{B}^{i}. 
+    \end{equation}
+    Następnie, ograniczając szereg do wyrazu liniowego, uzyskali formułę dobrze
+    przybliżającą oryginalną regułę adaptacji.
+    W ten sposób została wyeliminowana konieczność wyliczania pierwiastka kwadratowego macierzy kowariancji.
+    Jednakże sposób modyfikacji zasięgu mutacji $\sigma^{t}$ nadal wymagał złożonych operacji macierzowych.
+    W ramach proponowanych zmian zasugerowałem użycie uogólnionej postaci reguły $1\5$ \cite{one-fifth}, która jest wolna od jakichkolwiek operacji macierzowych. W pierwotnej wersji dotyczy ona wyłącznie strategii ewolucyjnych, w których populacja bazowa składa się z jednego punktu.
+    Poniżej znajdują się moje propozycje dostosowania tej reguły do strategii ewolucyjnych, w których populacja bazowa wynosi $\lambda \geq 2$. W każdej z nich punkt środkowy $\tilde \wek{x}$ należy rozumieć jako średnią arytmetyczną z całej populacji, tj.
+    \begin{equation}
+      \tilde \wek{x} = \frac{1}{\lambda}\sum^{\lambda}_{i = 1} \wek{x}_{i}
+    \end{equation}
+
+    Postać pierwszej z nich znajduje się w listingu \ref{PPMF}. Bazuja ona na wartości funkcji celu punktu środkowego z poprzedniej iteracji -- $\tilde \wek{x}^{t-1}$. Prawdopodobieństwo sukcesu $p_s$ w jej ramach definiowane jest jako liczba punktów w populacji, których wartość funkcji celu jest mniejsza od wartości funkcji celu punktu środkowego z poprzedniej iteracji.
+%    listing tu
+    Druga metoda jest zaprezentowana w listingu \ref{CPEF}. Mechanizm działania reguły jest ten sam z tą różnicą, że zamiast punktu środkowego jako średniej arytmetycznej do wyliczenia parametru $p_s$ brany jest wektor wartości oczekiwanej
+w iteracji $t$, tj. wektor $\wek{m}^t$.
+  % listing tu
+  Metoda trzecia oparta jest na obserwacji poczynionej w \cite{midpoint} zgodnie, z którą punkt środkowy $\tilde \wek{x}^{t}$ najlepiej estymuje optimum lokalne
+  spośród punktów w populacji w iteracji $t$.
+  Jeśli wartość funkcji celu $\tidle \wek{x}^{t}$ jest lepsza od wartości funkcji celu najlepszego punktu w populacji $\wek{x_{\text{best}}}^{t}$, to najprawdopodobniej znajduje się ona w bliskim sąsiedztwie optimum lokalnego. Wówczas zasięg mutacji powinien zostać zmniejszony, aby algorytm mógł z większą prezycją eskploatować dany obszar funkcji celu. W metodzie tej prawdopodobieństwo sukcesu jest porównywane z $k$-tym percentylem wartości funkcji celu punktów populacji.
+  % listing tu
