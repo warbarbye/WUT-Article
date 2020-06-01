@@ -1,21 +1,24 @@
 \section{Mechanizmy adaptacyjne}
-\label{section:adaptacja}
-Pseudokod zawarty na wypisie (\ref{alg-CMA-ES}) przedstawia kanoniczną wersję algorytmu \texttt{CMA-ES}. Metoda steruje trzema parametrami: wektorem oczekiwanym $\wek{m}^{t}$, macierzą kowariancji
-$\mat{C}^t$ oraz zasięgiem mutacji $\sigma^t$. Parametry te specyfikują wielowymiarowy rozkład normalny, który służy do tworzenia nowych punktów. Indeks górny $t$ oznacza numer iteracji algorytmu.
-W każdej iteracji algorytm przy pomocy rozkładu normalnego z zerową wartoścoią oczekiwaną oraz macierzą kowariancji $\mat{C}^t$ generuje zbiór wektorów $\{\wek{d}_1^t,...,\wek{d}_\lambda^t\}$ (linia 6). 
-Wektory te służą do zaburzenia obecnego w danej iteracji wektora wartości oczekiwanej $\wek{m}^t$ wskutek czego powstają wektory pochodne $\wek{x}^t_i=\wek{m}^t+\sigma^t \wek{d}_i^t$.
-Zbiór wektorów pochodnych jest sortowany malejąco (linia 10). Ze zbioru $\lambda$ wektorów wydzielany jest podzbiór $\mu$ wektorów o najmniejszej wartości funkcji celu. Podzbiór ten służy do
+\label{section:adaptacje}
+Pseudokod zawarty na wydruku (\ref{L1}) przedstawia kanoniczną wersję algorytmu \texttt{CMA-ES}. Metoda utrzymuje trzy parametry: wektor oczekiwany $\wek{m}^{t}$, macierz kowariancji
+$\mat{C}^t$ oraz zasięg mutacji $\sigma^t$. Parametry te specyfikują wielowymiarowy rozkład normalny, który służy do tworzenia nowych punktów w kolejnych generacjach. Indeks górny $t$ oznacza numer iteracji algorytmu.
+W każdej iteracji algorytm przy pomocy rozkładu normalnego z zerową wartością oczekiwaną oraz macierzą kowariancji $\mat{C}^t$ generuje zbiór wektorów $\{\wek{d}_1^t,...,\wek{d}_\lambda^t\}$ (linia 6). 
+Wektory te służą do zaburzenia obecnego w danej iteracji wektora wartości oczekiwanej $\wek{m}^t$ wskutek czego powstają wektory pochodne
+\begin{equation}
+    \wek{x}^t_i=\wek{m}^t+\sigma^t \wek{d}_i^t.
+\end{equation}
+Zbiór wektorów pochodnych jest sortowany malejąco (linia 10). Ze zbioru wektorów bazowych o liczności $\lambda$ wydzielany jest podzbiór o liczności $\mu$ wektorów o najmniejszej wartości funkcji celu. Podzbiór ten służy do
 aktualizacji parametrów algorytmu. \\
 Wartość oczekiwana $\wek{m}^t$ rozkładu aktualizowana jest wskutek zsumowania jej ze średnią ważoną wyselekcjonowanych wektorów $\wek{d}_{i}^{t}$. Wagi $w_{i}$ powinny być liczbami dodatnimi, których suma wynosi $1$ \cite{HansenOstermeier01}.
 
-\begin{algorithm}
+\begin{algorithm}[h]
   \renewcommand{\thealgorithm}{}
-  \caption{CMAES} \label{alg-CMA-ES}
+  \caption{Algorytm CMA-ES\label{L1}} 
   \begin{algorithmic}[1]
   \State $t \gets 1$
 \State $\wek{p}_c^1 \gets \wek{0}$, $\wek{p}_\sigma^1 \gets \wek{0}$
 \While{!stop}
-   \For{$i=1$ \to $\lambda$}
+   \For{$i=1\colon\lambda$}
       \State $ \wek{d}_i^t \sim N(\wek{0}, \mat{C}^t) $
       \State $\wek{x}_i^t=\wek{m}^{t} + \sigma^t \wek{d}_i^t $
       \State evaluate $(\wek{x}_i^t)$
@@ -35,36 +38,34 @@ $\qquad \mat{C}_1^t=(\wek{p}_c^t)(\wek{p}_c^t)^\tran$
 \end{algorithm}
 Sposób aktualizacji macierzy kowariancji oraz parametru zasięgu mutacji ze względu na jego znaczenie opisałem kolejno w sekcji (\ref{CMA}) oraz (\ref{CSA}).
 \subsection{Adaptacja macierzy kowariancji \label{CMA}}
-  Macierz kowariancji $\mat{C}^{t+1}$ wyliczana jest jako suma złożona z dwóch składników. Pierwszy z nich, $\mat{C}^t_\mu$, jest macierzą rangi $\mu$, która powstaje jako ważona suma iloczynu zewnętrznego $\mu$ wektorów  $\wek{d}_{i}^{t}$. Drugi z nich,  $\mat{C}^t_1$, jest macierzą o rzędzie równym 1 powstałą jako iloczyn zewnętrzny wektora $\wek{p}_c^t$. Wektor ten jest jedną ze ścieżek ewolucyjnych, które utrzymuje algortym w ramach swojego działania. 
-  Oba składniki mają na celu zwiększenie prawdopodobieństwa wylosowania wektorów w kierunku poprawy, tj. mniejszej wartości funkcji celu. Wkład macierzy $\mat{C}^t_\mu$ reprezentuje zysk, który przynosi selekcja osobników, a z kolei macierz $\mat{C}^t_1$ -- zysk wnoszony przez ścieżkę ewolucyjną $\wek{p}_c^t$. Ścieżkę tę należy rozumieć jako trajektorię populacji zgodnie z którą kierunki tworzenia nowych punktów były najlepsze \cite{Hansen2001}.
+  Macierz kowariancji $\mat{C}^{t+1}$ wyliczana jest jako suma złożona z dwóch składników. Pierwszy z nich, $\mat{C}^t_\mu$, jest macierzą rangi $\mu$, która powstaje jako ważona suma iloczynu zewnętrznego $\mu$ wektorów  $\wek{d}_{i}^{t}$. Drugi z nich,  $\mat{C}^t_1$, jest macierzą o rzędzie równym 1 powstałą jako iloczyn zewnętrzny wektora $\wek{p}_c^t$. Wektor ten jest jedną ze ścieżek ewolucyjnych, które utrzymuje algortym w ramach swojego działania.\\ 
+  \indent Oba składniki mają na celu zwiększenie prawdopodobieństwa wylosowania wektorów w kierunku poprawy, tj. mniejszej wartości funkcji celu. Wkład macierzy $\mat{C}^t_\mu$ odpowiada za zysk, który przynosić ma selekcja osobników, a z kolei macierz $\mat{C}^t_1$ -- odpowiada za zysk wnoszony przez ścieżkę ewolucyjną $\wek{p}_c^t$. Ścieżkę tę należy rozumieć jako trajektorię populacji zgodnie z którą kierunki tworzenia nowych punktów były najlepsze \cite{Hansen2001}.
 \subsection{Kumulatywna adaptacja zasięgu mutacji \label{CSA}}
-Sposób aktualizowania zasięgu mutacji $\sigma^t$ oparty jest na poniższym rozumowaniu. Niech funkcja celu $f$ będzie funkcją stałą. Wówczas składowe wektorów $\wek{d}_i^t$ nie posiadają korelacji z ich położeniem w przestrzeni.
-Konsekwencją tego jest fakt, że wyselekcjonowane wektory  $\wek{d}_i^t$ są niezależne oraz zgodne z rozkładem $\mathcal{N}(0, \mat{C}^{t})$. W wyniku przekształcenia
-  \begin{equation}
-    (\mat{C}^{t})^{-\frac{1}{2}}\wek{d}_{i}^{t}
-  \end{equation}
-  wektory będą zgodne z izotropowym rozkładem normalnym, tj. $\mathcal{N}(0, I)$. W związku z powżyszym wektor $(\mat{C}^t)^{-1/2} \wek{\Delta}^t$ będzie posiadał rozkład normalny z zerową wartością oczekiwaną
-  oraz macierzą kowariancji równą:
-  \begin{equation}
-    \Sigma((\mat{C}^t)^{-1/2} \wek{\Delta}^t) = \sum_{i=1}^\mu (w_i)^2 \mat{I}=\frac{1}{\mu_\text{eff}} \mat{I}
-    \label{eq:01}
-  \end{equation}
-%\floatname{algorithm}{Procedure}
-%\setcounter{algorithm}{0}
-%\begin{algorithm}[h]
-%\caption{CSA}
-%\begin{algorithmic}[1]
-   %\STATE $\wek{p}_\sigma^{t+1} \gets (1-c_s)\wek{p}_\sigma^t + \sqrt{\mu_\text{eff} c_s(2-c_s)} \cdot (\mat{C}^t)^{-\frac{1}{2}}\wek{\Delta}^t$
-   %\STATE $\sigma^{t+1} \gets \sigma^t \exp\left(\frac{c_s}{d_\sigma} \left(\frac{\| \wek{p}_\sigma^{t+1} \|}{E\|N(\wek{0},\mat{I})\|}-1\right)\right) $
-%\end{algorithmic}
-%\end{algorithm}
+Podobnie jak w przypadku adaptacji macierzy kowariancji strojenie zasięgu mutacji odbywa się przy pomocy ścieżki ewolucyjnej $\wek{p}^{t}_\sigma$. \\
+\indent Ścieżka ta kumuluje ona kierunki przesunięcia punktu środkowego, ale znormalizowanego przez odwrotny pierwiastek kwadratowy macierzy kowariancji w taki sposób, aby między kolejnymi wektorami nie było korelacji. Norma wektora $\wek{p}^{t}_\sigma$ porównywana jest z
+oczekiwaną długością $N$-wymiarowego wektora losowego z rozkładu $\mathcal{N}(0, \mat{I})$. Wynik porównania służy do dostosowania 
+wartości zasięgu mutacji $\sigma^{t+1}$ w następnej iteracji algorytmu. Jeśli stosunek norm przedstawiony w równaniu (\ref{eq:csa}):
+\begin{equation}
+    \label{eq:csa}
+    \frac{\|\wek{p}_\sigma^{t}\|}{E\|N(\wek{0},\mat{I})\|}
+\end{equation}  
+jest większy od jedności, to zasięg mutacji powinien zostać zwiększony, a o algorytmie możemy powiedzieć, że jest w fazie \textit{eksploracji} przestrzeni przeszukiwań. W przeciwnym razie zasięg powinien zostać zmniejszony -- algorytm jest wówczas w fazie \textit{eksploatacji}.
+
+\begin{algorithm}[h]
+\caption{Reguła \texttt{CSA}}
+\begin{algorithmic}[1]
+   \State $\wek{p}_\sigma^{t+1} \gets (1-c_s)\wek{p}_\sigma^t + \sqrt{\mu_\text{eff} c_s(2-c_s)} \cdot (\mat{C}^t)^{-\frac{1}{2}}\wek{\Delta}^t$
+   \State $\sigma^{t+1} \gets \sigma^t \exp\left(\frac{c_s}{d_\sigma} \left(\frac{\| \wek{p}_\sigma^{t+1} \|}{E\|N(\wek{0},\mat{I})\|}-1\right)\right) $
+\end{algorithmic}
+\end{algorithm}
 \subsection{Złożoność obliczeniowa}
-  Obie opisane wyżej reguły przyczyniają się do znacznej poprawy działania algorytmu w kontekście ekstrapolacji i eksploatacji przestrzeni przeszukiwań. Niestety, ceną tego jest fakt znacznie zwiększona złożoność obliczeniowa algorytmu. Wynika ona z faktu stosowania operacji wyliczania pierwiastka kwadratowego macierzy (linia 6 algorytmu \ref{alg-CMA-ES}) oraz odwrotności tego pierwiastka (linia 1 \ref{alg-CSA}).
-  W kanonicznej wersji algorytmu operacja ta jest realizowana przez rozkład spektralny macierzy symetrycznej, tj. rozkład macierzy kowariancji $\mat{C}$ na następującą postać:
+  Obie opisane wyżej reguły przyczyniają się do znacznej poprawy działania algorytmu w kontekście ekstrapolacji i eksploatacji przestrzeni przeszukiwań. Niestety, ceną tego jest fakt znacznie zwiększonej złożoność obliczeniowej algorytmu. Wynika ona z faktu stosowania operacji wyliczania pierwiastka kwadratowego macierzy (linia 6 algorytmu \ref{alg-CMA-ES}) oraz odwrotności tego pierwiastka (linia 1 \ref{alg-CSA}).\\
+  \indent W kanonicznej wersji algorytmu operacja ta jest realizowana przez rozkład spektralny macierzy symetrycznej, tj. rozkład macierzy kowariancji $\mat{C}$ według poniższej formuły:
   \begin{equation}
-    \mat{C} = \mat{B}\mat{D}^{2}\mat{B}^{T}
+    \mat{C} = \mat{B}\mat{D}^{2}\mat{B}^{T}.
   \end{equation}
-  Umożliwia ona zarówno wyliczenie pierwiastka kwadratowego jak i odwrotoność macierzy. Jednakże złożoność tych operacji jest rzędu $\mathcal{O}(n^3)$, co ogranicza stosowalność metody \texttt{CMA-ES} w przypadku zadań optymalizacyjnych o większej wymiarowości, tj. $N > 100$ \cite{hansen2006cma}.
-  Poczyniono szereg działań w kierunku zmniejszenia złożoności obliczeniowej algorytmu. Część badaczy skłania się do przedstawienia macierzy kowariancji jako sumę macierzy identycznościowej oraz iloczynu zewnętrznego gradientu naturalnego funkcji celu \cite{Poland2001}. Podejmowano również próby eliminacji stosowania jakichkolwiek operacji macierzowych na rzecz wektorowego modelowania różnicy między macierzą kowariancji, a macierzą identycznościową \cite{Loshchilov2017}.
-  Ograniczenia operacji macierzowych podjął się również autor algorytmu \texttt{CMA-ES}, zastępując regułę \texttt{CSA} przez regułę \texttt{MSR} (ang. Median Success Rule).
-  Zauważam jednak pewne problemy z proponowanymi modyfikacjami. Redukcji złożoności obliczeniowej lub pamięciowej najczęściej towarzyszył znaczny spadek jakości działania względem oryginalnej wersji algorytmu. Tracona również była mniej wymierna własność algorytmu \texttt{CMA-ES}, tj. jego prostota koncepcyjna. 
+  Umożliwia ona zarówno wyliczenie pierwiastka kwadratowego jak i odwrotność samej macierzy. Jednakże złożoność tych operacji jest rzędu $\mathcal{O}(n^3)$, co ogranicza stosowalność metody \texttt{CMA-ES} w przypadku zadań optymalizacyjnych o większej wymiarowości, tj. $N > 100$ \cite{hansen2006cma}. \\
+  \indent Poczyniono szereg działań w kierunku zmniejszenia złożoności obliczeniowej algorytmu. Część badaczy skłania się do przedstawienia macierzy kowariancji jako sumy macierzy jednostkowej oraz iloczynu zewnętrznego (ang. \textit{outer product}) gradientu naturalnego funkcji celu \cite{Poland2001}. Podejmowano również próby eliminacji stosowania jakichkolwiek operacji macierzowych na rzecz wektorowego modelowania różnicy między macierzą kowariancji, a macierzą jednostkową \cite{Loshchilov2017}.
+  Ograniczenia operacji macierzowych podjął się również autor algorytmu \texttt{CMA-ES}, zastępując regułę \texttt{CSA} regułą \texttt{MSR} (ang. Median Success Rule) \cite{Elhara13}.\\
+ \indent Zauważam jednak pewne problemy z proponowanymi modyfikacjami. Redukcji złożoności obliczeniowej lub pamięciowej najczęściej towarzyszył znaczny spadek jakości działania względem oryginalnej wersji algorytmu. Tracona również była mniej wymierna własność algorytmu \texttt{CMA-ES}, tj. jego prostota koncepcyjna. 
+
