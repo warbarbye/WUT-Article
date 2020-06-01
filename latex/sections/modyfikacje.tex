@@ -1,33 +1,67 @@
 \section{Modyfikacje reguł adaptacyjnych}
 \label{section:modyfikacje}
   Dokonane przeze mnie modyfikacje algorytmu dotyczyły postaci 
-  reguły adaptacji macierzy kowariancji oraz zasięgu mutacji.
-  W celu zmniejszenia narzutu obliczeniowego zastosowano zmiany sugerowane
+  reguły adaptacji macierzy kowariancji oraz zasięgu mutacji. \\
+  \indent W celu zmniejszenia narzutu obliczeniowego zastosowano zmiany sugerowane
   w \cite{SMAES}. Autorzy, bazując na obserwacji, że klasycznie stosowana reguła adaptacji macierzy kowariancji daje się sprowadzić do ogólnej postaci:
     \begin{equation}
       \mat{A}\mat{A}^{T} = \mat{M}\left[\mat{I} + \mat{B}\right]\mat{M}^{T}
     \end{equation}
 
-    zastosowali rozwinięcie macierzy $\mat{A}$, która odpowiada macierzy $\mat{C}^{t+1}$ w kontekście logiki algorytmu, w szereg potęgowy:
+\noindent zastosowali rozwinięcie macierzy $\mat{A}$, która odpowiada macierzy $\mat{C}^{t+1}$ w kontekście logiki algorytmu, w szereg potęgowy:
     \begin{equation}
       \mat{A} = \mat{M}\sum^{\infty}_{i = 0}\gamma_{i}\mat{B}^{i}. 
     \end{equation}
-    Następnie, ograniczając szereg do wyrazu liniowego, uzyskali formułę dobrze
+   \indent Następnie, ograniczając szereg do wyrazu liniowego, uzyskali formułę poprawnie
     przybliżającą oryginalną regułę adaptacji.
-    W ten sposób została wyeliminowana konieczność wyliczania pierwiastka kwadratowego macierzy kowariancji.
-    Jednakże sposób modyfikacji zasięgu mutacji $\sigma^{t}$ nadal wymagał złożonych operacji macierzowych.
-    W ramach proponowanych zmian zasugerowałem użycie uogólnionej postaci reguły $1\\5$ \cite{Schwefel95}, która jest wolna od jakichkolwiek operacji macierzowych. W pierwotnej wersji dotyczy ona wyłącznie strategii ewolucyjnych, w których populacja bazowa składa się z jednego punktu.
+    W ten sposób została wyeliminowana konieczność wyliczania pierwiastka kwadratowego macierzy kowariancji.\\
+    Jednakże sposób modyfikacji zasięgu mutacji $\sigma^{t}$ nadal wymagał złożonych operacji macierzowych.\\
+   \indent W ramach proponowanych zmian zasugerowałem użycie uogólnionej postaci reguły $1/5$ \cite{Schwefel95}, która nie stosuje jakichkolwiek operacji macierzowych. W pierwotnej wersji dotyczy ona wyłącznie strategii ewolucyjnych, w których populacja bazowa składa się z jednego punktu.
     Poniżej znajdują się moje propozycje dostosowania tej reguły do strategii ewolucyjnych, w których populacja bazowa wynosi $\lambda \geq 2$. W każdej z nich punkt środkowy $\wek{\tilde x}$ należy rozumieć jako średnią arytmetyczną z całej populacji, tj.
     \begin{equation}
-      \wek{\tilde x} = \frac{1}{\lambda}\sum^{\lambda}_{i = 1} \wek{x}_{i}
+      \wek{\tilde x} = \frac{1}{\lambda}\sum^{\lambda}_{i = 1} \wek{x}_{i}.
     \end{equation}
 
-    Postać pierwszej z nich znajduje się w listingu \ref{PPMF}. Bazuja ona na wartości funkcji celu punktu środkowego z poprzedniej iteracji -- $\wek{\tilde x}^{t-1}$. Prawdopodobieństwo sukcesu $p_s$ w jej ramach definiowane jest jako liczba punktów w populacji, których wartość funkcji celu jest mniejsza od wartości funkcji celu punktu środkowego z poprzedniej iteracji.
-%    listing tu
-    Druga metoda jest zaprezentowana w listingu \ref{CPEF}. Mechanizm działania reguły jest ten sam z tą różnicą, że zamiast punktu środkowego jako średniej arytmetycznej do wyliczenia parametru $p_s$ brany jest wektor wartości oczekiwanej
-w iteracji $t$, tj. wektor $\wek{m}^t$.
-  % listing tu
-  Metoda trzecia oparta jest na obserwacji poczynionej w \cite{Arabas17} zgodnie, z którą punkt środkowy $\wek{\tilde x}^{t}$ najlepiej estymuje optimum lokalne
-  spośród punktów w populacji w iteracji $t$.
-  Jeśli wartość funkcji celu $\wek{\tilde x}^{t}$ jest lepsza od wartości funkcji celu najlepszego punktu w populacji $\wek{x_{\text{best}}}^{t}$, to najprawdopodobniej znajduje się ona w bliskim sąsiedztwie optimum lokalnego. Wówczas zasięg mutacji powinien zostać zmniejszony, aby algorytm mógł z większą prezycją eskploatować dany obszar funkcji celu. W metodzie tej prawdopodobieństwo sukcesu jest porównywane z $k$-tym percentylem wartości funkcji celu punktów populacji.
-  % listing tu
+    Postać pierwszej, tj. reguły \texttt{PPMF} (ang. \textit{Previous Population Midpoint Fitness}), z nich znajduje się na wydruku \ref{PPMF}. Bazuje ona na wartości funkcji celu punktu środkowego z poprzedniej iteracji -- $\wek{\tilde x}^{t-1}$. Prawdopodobieństwo sukcesu $p_s$ w jej ramach definiowane jest jako liczba punktów w populacji, których wartość funkcji celu jest mniejsza od wartości funkcji celu punktu środkowego poprzedniej iteracji (linia 3).
+
+\begin{algorithm}[h]
+    \caption{Reguła \texttt{PPMF}}
+\begin{algorithmic}[1]
+   \State $\overline{\wek{x}}^{t-1}=\frac{1}{\lambda}\sum_{i=1}^\lambda \wek{x}_i^{t-1}$
+   \State evaluate $(\overline{\wek{x}}^{t-1})$
+   \State $p_s = \left|\{i: q(\wek{x}_i^t) < q(\overline{\wek{x}}^{t-1})\}\right|/\lambda$
+   \State $\sigma^{t+1} \gets \sigma^t \exp\left(\frac{1}{d} \cdot \frac{p_s-p_\text{target}}{1-p_\text{target}}\right) $
+\end{algorithmic}
+\end{algorithm}
+
+    Druga metoda, reguła \texttt{CPEF} (ang. Current Population Expectation Fitness), jest zaprezentowana na wydruku \ref{CPEF}. Mechanizm działania reguły jest ten sam co dla reguły \texttt{PPMF} z tą różnicą, że zamiast punktu środkowego jako średniej arytmetycznej do wyliczenia parametru $p_s$ służy wartość oczekiwana $\wek{m}^t$.
+    
+\begin{algorithm}[h]
+\caption{ Reguła \texttt{CPEF}}
+\begin{algorithmic}[1]
+   \State evaluate $(\wek{m}^t)$
+   \State $p_s = \left|\{i: q(\wek{x}_i^t) < q(\wek{m}^t)\}\right|/\lambda$
+   \State $\sigma^{t+1} \gets \sigma^t \exp\left(\frac{1}{d} \cdot \frac{p_s-p_\text{target}}{1-p_\text{target}}\right)  $
+\end{algorithmic}
+\end{algorithm}
+
+ 
+  Trzecia metoda, reguła \texttt{CPMF} (ang. \textit{Current Population Midpoint Fitness}), oparta jest na obserwacji poczynionej w \cite{Arabas17}, zgodnie z którą punkt środkowy $\wek{\tilde x}^{t}$ najlepiej estymuje optimum lokalne
+  spośród wszystkich punktów populacji.
+  Jeśli wartość funkcji celu $\wek{\tilde x}^{t}$ jest lepsza od wartości funkcji celu najlepszego punktu w populacji $\wek{x}^{t}_{\text{best}}$, to najprawdopodobniej znajduje się ona w bliskim sąsiedztwie optimum lokalnego. Wówczas zasięg mutacji powinien zostać zmniejszony, aby algorytm mógł z większą prezycją eskploatować dany obszar funkcji celu. W metodzie tej prawdopodobieństwo sukcesu jest porównywane z $k$-tym percentylem wartości funkcji celu punktów populacji (linia 4).
+ \begin{algorithm}[h]
+    \caption{Reguła \texttt{CPMF}}
+\begin{algorithmic}[1]
+   \State $\overline{\wek{x}}^t=\frac{1}{\lambda}\sum_{i=1}^\lambda \wek{x}_i^t$
+   \State evaluate $(\overline{\wek{x}}^t)$
+   \State $p_s = \left|\{i: q(\wek{x}_i^t) < q(\overline{\wek{x}}^t)\}\right|/\lambda$
+   \If {$p_s < k$}
+   \State $\sigma^{t+1} \gets \alpha \cdot \sigma^t $
+   \Else 
+   \State $\sigma^{t+1} \gets \alpha^{-1} \cdot \sigma^t $
+   \EndIf
+\end{algorithmic}
+\end{algorithm}
+
+Ze względu na wczesny etap prac nie ustaliłem jeszcze optymalnych parametrów metody. W ramach eksperymentów opisanych w sekcji (\ref{section:eksperymenty}) opracowane przeze mnie metody
+posiadają następujące wartości parametrów sterujących: $k = 0.09$, $p_{\text{target}} = 0.25$, $d = 8$. Wybór akurat tych wartości ma charakter arbitralny.
